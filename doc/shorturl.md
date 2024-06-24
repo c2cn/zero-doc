@@ -1,3 +1,5 @@
+# DEPRECATED: PLEASE MOVE TO https://go-zero.dev/cn/extended-reading.html
+
 # 快速构建高并发微服务
 
 [English](shorturl-en.md) | 简体中文
@@ -19,11 +21,11 @@
   3. 日志，用于数据收集和问题定位
   4. 可观测性，没有度量就没有优化
 
-对于其中每一点，我们都需要用很长的篇幅来讲述其原理和实现，那么对我们后端开发者来说，要想把这些知识点都掌握并落实到业务系统里，难度是非常大的，不过我们可以依赖已经被大流量验证过的框架体系。[go-zero 微服务框架](https://github.com/tal-tech/go-zero)就是为此而生。
+对于其中每一点，我们都需要用很长的篇幅来讲述其原理和实现，那么对我们后端开发者来说，要想把这些知识点都掌握并落实到业务系统里，难度是非常大的，不过我们可以依赖已经被大流量验证过的框架体系。[go-zero 微服务框架](https://github.com/zeromicro/go-zero)就是为此而生。
 
 另外，我们始终秉承 **工具大于约定和文档** 的理念。我们希望尽可能减少开发人员的心智负担，把精力都投入到产生业务价值的代码上，减少重复代码的编写，所以我们开发了 `goctl` 工具。
 
-下面我通过短链微服务来演示通过 [go-zero](https://github.com/tal-tech/go-zero) 快速的创建微服务的流程，走完一遍，你就会发现：原来编写微服务如此简单！
+下面我通过短链微服务来演示通过 [go-zero](https://github.com/zeromicro/go-zero) 快速的创建微服务的流程，走完一遍，你就会发现：原来编写微服务如此简单！
 
 ## 1. 什么是短链服务
 
@@ -33,7 +35,7 @@
 
 ## 2. 短链微服务架构图
 
-<img src="https://gitee.com/kevwan/static/raw/master/doc/images/shorturl-arch.png" alt="架构图" width="800" />
+<img src="https://raw.githubusercontent.com/zeromicro/zero-doc/main/doc/images/shorturl-arch.png" alt="架构图" width="800" />
 
 * 这里只用了 `Transform RPC` 一个微服务，并不是说 API Gateway 只能调用一个微服务，只是为了最简演示 API Gateway 如何调用 RPC 微服务而已
 * 在真正项目里要尽可能每个微服务使用自己的数据库，数据边界要清晰
@@ -44,15 +46,15 @@
 
 * API Gateway
 
-  <img src="https://gitee.com/kevwan/static/raw/master/doc/images/shorturl-api.png" alt="api" width="800" />
+  <img src="https://raw.githubusercontent.com/zeromicro/zero-doc/main/doc/images/shorturl-api.png" alt="api" width="800" />
 
 * RPC
 
-  <img src="https://gitee.com/kevwan/static/raw/master/doc/images/shorturl-rpc.png" alt="架构图" width="800" />
+  <img src="https://raw.githubusercontent.com/zeromicro/zero-doc/main/doc/images/shorturl-rpc.png" alt="架构图" width="800" />
 
 * model
 
-  <img src="https://gitee.com/kevwan/static/raw/master/doc/images/shorturl-model.png" alt="model" width="800" />
+  <img src="https://raw.githubusercontent.com/zeromicro/zero-doc/main/doc/images/shorturl-model.png" alt="model" width="800" />
 
 下面我们来一起完整走一遍快速构建微服务的流程，Let’s `Go`!🏃‍♂️
 
@@ -60,23 +62,24 @@
 
 * 安装 etcd, mysql, redis
 
-* 安装 `protoc-gen-go`
-
-  ```shell
-  go get -u github.com/golang/protobuf/protoc-gen-go
-  ```
-* 安装 `protoc`
-  ``` shell
-  wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.protoc-3.14.0-linux-x86_64.zip
-  unzip protoc-3.14.0-linux-x86_64.zip
-  mv bin/protoc /usr/local/bin/
-  ```
-
 * 安装 goctl 工具
 
   ```shell
-  GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/tal-tech/go-zero/tools/goctl
+  # go 1.16 及以下版本
+  GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/zeromicro/go-zero/tools/goctl@latest
+  # go1.16 以上版本
+  GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go install github.com/zeromicro/go-zero/tools/goctl@latest
   ```
+  
+* 安装 `protoc` , `protoc-gen-go`
+
+```shell
+goctl env install --verbose --force
+```
+
+以上安装详细教程可以参考 
+- [goctl 安装](https://go-zero.dev/docs/tasks/installation/goctl)
+- [protoc 安装](https://go-zero.dev/docs/tasks/installation/protoc)
 
 * 创建工作目录 `shorturl` 和 `shorturl/api`
 
@@ -86,19 +89,9 @@
 
   ```Plain Text
   module shorturl
-
-  go 1.15
-
-  require (
-    github.com/golang/mock v1.4.3
-    github.com/golang/protobuf v1.4.2
-    github.com/tal-tech/go-zero v1.1.4
-    golang.org/x/net v0.0.0-20200707034311-ab3426394381
-    google.golang.org/grpc v1.29.1
-  )
+  
+  go 1.20 // 这里的版本取决于你本地 golang 版本，并非完全一致
   ```
-
-  **注意：这里可能存在 grpc 版本依赖的问题，可以用以上配置**
 
 ## 5. 编写 API Gateway 代码
 
@@ -108,38 +101,34 @@
   goctl api -o shorturl.api
   ```
 
-* 编辑 `api/shorturl.api`，为了简洁，去除了文件开头的 `info`，代码如下：
+* 编辑 `api/shorturl.api`，替换内容为如下：
 
   ```go
   type (
-    expandReq struct {
+    expandReq {
       shorten string `form:"shorten"`
     }
   
-    expandResp struct {
+    expandResp {
       url string `json:"url"`
     }
   )
   
   type (
-    shortenReq struct {
+    shortenReq {
       url string `form:"url"`
     }
   
-    shortenResp struct {
+    shortenResp {
       shorten string `json:"shorten"`
     }
   )
   
   service shorturl-api {
-    @server(
-      handler: ShortenHandler
-    )
+    @handler ShortenHandler
     get /shorten(shortenReq) returns(shortenResp)
   
-    @server(
-      handler: ExpandHandler
-    )
+    @handler ExpandHandler
     get /expand(expandReq) returns(expandResp)
   }
   ```
@@ -151,7 +140,7 @@
   * `handler` 定义了服务端 handler 名字
   * `get /shorten(shortenReq) returns(shortenResp)` 定义了 get 方法的路由、请求参数、返回参数等
 
-* 使用 goctl 生成 API Gateway 代码
+* 在 api 目录下，使用 goctl 生成 API Gateway 代码
 
   ```shell
   goctl api go -api shorturl.api -dir .
@@ -184,6 +173,8 @@
   └── go.sum
   ```
 
+* 执行 `go mod tidy` 整理依赖
+
 * 启动 API Gateway 服务，默认侦听在 8888 端口
 
   ```shell
@@ -193,21 +184,22 @@
 * 测试 API Gateway 服务
 
   ```shell
-  curl -i "http://localhost:8888/shorten?url=http://www.xiaoheiban.cn"
+  curl -i "http://localhost:8888/shorten?url=https://go-zero.dev"
   ```
 
   返回如下：
 
   ```http
   HTTP/1.1 200 OK
-  Content-Type: application/json
-  Date: Thu, 27 Aug 2020 14:31:39 GMT
-  Content-Length: 15
+  Content-Type: application/json; charset=utf-8
+  Traceparent: 00-a9e12f21fa866a09fadf19a29c8d86cb-9d4be07f5c2c789a-00
+  Date: Thu, 10 Aug 2023 02:06:20 GMT
+  Content-Length: 4
   
-  {"shorten":""}
+  null%
   ```
 
-  可以看到我们 API Gateway 其实啥也没干，就返回了个空值，接下来我们会在 rpc 服务里实现业务逻辑
+  可以看到我们 API Gateway 其实啥也没干，就返回了个 null，接下来我们会在 rpc 服务里实现业务逻辑
 
 * 可以修改 `internal/svc/servicecontext.go` 来传递服务依赖（如果需要）
 
@@ -219,91 +211,101 @@
 
 ## 6. 编写 transform rpc 服务
 
-- 在 `shorturl` 目录下创建 `rpc` 目录
+- 在 `shorturl` 目录下创建 `rpc/transform` 目录
 
+  ```shell
+  mkdir -p rpc/transform
+  ```
 * 在 `rpc/transform` 目录下编写 `transform.proto` 文件
 
   可以通过命令生成 proto 文件模板
 
   ```shell
-  goctl rpc template -o transform.proto
+  goctl rpc -o transform.proto
   ```
 
-  修改后文件内容如下：
+  修改后文件将内容替换如下：
 
-  ```protobuf
-  syntax = "proto3";
-  
-  package transform;
-  
-  message expandReq {
-      string shorten = 1;
-  }
-  
-  message expandResp {
-      string url = 1;
-  }
-  
-  message shortenReq {
-      string url = 1;
-  }
-  
-  message shortenResp {
-      string shorten = 1;
-  }
-  
-  service transformer {
-      rpc expand(expandReq) returns(expandResp);
-      rpc shorten(shortenReq) returns(shortenResp);
-  }
-  ```
+```protobuf
+syntax = "proto3";
+
+package transform;
+
+option go_package = "./transform";
+
+message expandReq{
+  string shorten = 1;
+}
+
+message expandResp{
+  string url = 1;
+}
+
+message shortenReq{
+  string url = 1;
+}
+
+message shortenResp{
+  string shorten = 1;
+}
+
+service  transformer{
+  rpc expand(expandReq) returns(expandResp);
+  rpc shorten(shortenReq) returns(shortenResp);
+}
+
+```
 
 * 用 `goctl` 生成 rpc 代码，在 `rpc/transform` 目录下执行命令
 
   ```shell
-  goctl rpc proto -src transform.proto -dir .
+  
+  goctl rpc protoc transform.proto --go_out=. --go-grpc_out=. --zrpc_out=.
+  
   ```
 
   **注意：不能在 GOPATH 目录下执行以上命令**
 
   文件结构如下：
 
-  ```Plain Text
-  rpc/transform
-  ├── etc
-  │   └── transform.yaml              // 配置文件
-  ├── internal
-  │   ├── config
-  │   │   └── config.go               // 配置定义
-  │   ├── logic
-  │   │   ├── expandlogic.go          // expand 业务逻辑在这里实现
-  │   │   └── shortenlogic.go         // shorten 业务逻辑在这里实现
-  │   ├── server
-  │   │   └── transformerserver.go    // 调用入口, 不需要修改
-  │   └── svc
-  │       └── servicecontext.go       // 定义 ServiceContext，传递依赖
-  ├── pb
-  │   └── transform.pb.go
-  ├── transform.go                    // rpc 服务 main 函数
-  ├── transform.proto
-  └── transformer
-      ├── transformer.go              // 提供了外部调用方法，无需修改
-      ├── transformer_mock.go         // mock 方法，测试用
-      └── types.go                    // request/response 结构体定义
+```Plain Text
+rpc/transform
+├── etc
+│   └── transform.yaml              // 配置文件
+├── internal
+│   ├── config
+│   │   └── config.go               // 配置定义
+│   ├── logic
+│   │   ├── expandlogic.go          // expand 业务逻辑在这里实现
+│   │   └── shortenlogic.go         // shorten 业务逻辑在这里实现
+│   ├── server
+│   │   └── transformerserver.go    // 调用入口, 不需要修改
+│   └── svc
+│       └── servicecontext.go       // 定义 ServiceContext，传递依赖
+├── transform
+│   ├── transform.pb.go
+│   └── transform_grpc.pb.go
+├── transform.go                    // rpc 服务 main 函数
+├── transform.proto
+└── transformer
+    └── transformer.go              // 提供了外部调用方法，无需修改
   ```
 
-  直接可以运行，如下：
+* 执行 `go mod tidy` 整理依赖
+* 启动 etcd server
+* 启动 rpc 服务直接可以运行，如下：
 
   ```shell
   $ go run transform.go -f etc/transform.yaml
   Starting rpc server at 127.0.0.1:8080...
   ```
-  查看服务是否注册
+  查看服务是否注册，以下值为参考值，主要观察 etcd 有注册到 transform.rpc 的 key 和 8080 端口即可，各自机器的
+ip 结果不一样。
   ```
   $ETCDCTL_API=3 etcdctl get transform.rpc --prefix
-  transform.rpc/7587851893787585061
-  127.0.0.1:8080
-  ``` 
+  transform.rpc/7587872530397098244
+  192.168.3.37:8080
+  ```
   `etc/transform.yaml` 文件里可以修改侦听端口等配置
 
 ## 7. 修改 API Gateway 代码调用 transform rpc 服务
@@ -320,7 +322,7 @@
 
   通过 etcd 自动去发现可用的 transform 服务
 
-* 修改 `internal/config/config.go` 如下，增加 transform 服务依赖
+* 修改 `shorturl/api/internal/config/config.go` 如下，增加 transform 服务依赖
 
   ```go
   type Config struct {
@@ -329,7 +331,7 @@
   }
   ```
 
-* 修改 `internal/svc/servicecontext.go`，如下：
+* 修改 `shorturl/api/internal/svc/servicecontext.go`，如下：
 
   ```go
   type ServiceContext struct {
@@ -347,42 +349,42 @@
 
   通过 ServiceContext 在不同业务逻辑之间传递依赖
 
-* 修改 `internal/logic/expandlogic.go` 里的 `Expand` 方法，如下：
+* 修改 `shorturl/api/internal/logic/expandlogic.go` 里的 `Expand` 方法，如下：
 
   ```go
   func (l *ExpandLogic) Expand(req types.ExpandReq) (types.ExpandResp, error) {
-    // 手动代码开始
-	resp, err := l.svcCtx.Transformer.Expand(l.ctx, &transformer.ExpandReq{
-		Shorten: req.Shorten,
-	})
-	if err != nil {
-		return types.ExpandResp{}, err
-	}
+    // 手动代码开始 
+    rpcResp, err := l.svcCtx.Transformer.Expand(l.ctx, &transformer.ExpandReq{
+        Shorten: req.Shorten,
+    })
+    if err != nil {
+        return nil, err
+    }
 
-	return types.ExpandResp{
-		Url: resp.Url,
-	}, nil
-	// 手动代码结束
+    return &types.ExpandResp{
+        Url: rpcResp.Url,
+    }, nil
+	  // 手动代码结束
   }
   ```
 
 通过调用 `transformer` 的 `Expand` 方法实现短链恢复到 url
 
-* 修改 `internal/logic/shortenlogic.go`，如下：
+* 修改 `shorturl/api/internal/logic/shortenlogic.go`，如下：
 
   ```go
   func (l *ShortenLogic) Shorten(req types.ShortenReq) (types.ShortenResp, error) {
     // 手动代码开始
-	resp, err := l.svcCtx.Transformer.Shorten(l.ctx, &transformer.ShortenReq{
-		Url: req.Url,
-	})
-	if err != nil {
-		return types.ShortenResp{}, err
-	}
+    rpcResp, err := l.svcCtx.Transformer.Shorten(l.ctx, &transformer.ShortenReq{
+        Url: req.Url,
+    })
+    if err != nil {
+        return nil, err
+    }
 
-	return types.ShortenResp{
-		Shorten: resp.Shorten,
-	}, nil
+    return &types.ShortenResp{
+        Shorten: rpcResp.Shorten,
+    }, nil
 	// 手动代码结束
   }
   ```
@@ -393,6 +395,8 @@
 至此，API Gateway 修改完成，虽然贴的代码多，但是其中修改的是很少的一部分，为了方便理解上下文，我贴了完整代码，接下来处理 CRUD+cache
 
 ## 8. 定义数据库表结构，并生成 CRUD+cache 代码
+
+注意： 这里需要开发者自行安装一个本地的 mysql-server，并创建一个数据库 `gozero`，建议用 docker 安装，这里不再赘述
 
 * shorturl 下创建 `rpc/transform/model` 目录：`mkdir -p rpc/transform/model`
 
@@ -407,15 +411,7 @@
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   ```
 
-* 创建 DB 和 table
-
-  ```sql
-  create database gozero;
-  ```
-
-  ```sql
-  source shorturl.sql;
-  ```
+* 在 mysql-server 的 `go-zero` 数据库下新增如上表结构
 
 * 在 `rpc/transform/model` 目录下执行如下命令生成 CRUD+cache 代码，`-c` 表示使用 `redis cache`
 
@@ -430,7 +426,8 @@
   ```Plain Text
   rpc/transform/model
   ├── shorturl.sql
-  ├── shorturlmodel.go              // CRUD+cache 代码
+  ├── shorturlmodel.go              // 扩展代码
+  ├── shorturlmodel_gen.go          // CRUD+cache 代码
   └── vars.go                       // 定义常量和变量
   ```
 
@@ -439,7 +436,7 @@
 * 修改 `rpc/transform/etc/transform.yaml`，增加如下内容：
 
   ```yaml
-  DataSource: root:password@tcp(localhost:3306)/gozero
+  DataSource: root:password@tcp(localhost:3306)/gozero # 用户名和密码为你本地 mysql-server 密码，并非完全一致
   Table: shorturl
   Cache:
     - Host: localhost:6379
@@ -481,7 +478,7 @@
   ```go
   func (l *ExpandLogic) Expand(in *transform.ExpandReq) (*transform.ExpandResp, error) {
     // 手动代码开始
-    res, err := l.svcCtx.Model.FindOne(in.Shorten)
+    res, err := l.svcCtx.Model.FindOne(l.ctx,in.Shorten)
     if err != nil {
       return nil, err
     }
@@ -499,7 +496,7 @@
   func (l *ShortenLogic) Shorten(in *transform.ShortenReq) (*transform.ShortenResp, error) {
     // 手动代码开始，生成短链接
     key := hash.Md5Hex([]byte(in.Url))[:6]
-    _, err := l.svcCtx.Model.Insert(model.Shorturl{
+    _, err := l.svcCtx.Model.Insert(l.ctx,&model.Shorturl{
       Shorten: key,
       Url:     in.Url,
     })
@@ -517,56 +514,76 @@
   至此代码修改完成，凡是手动修改的代码我加了标注
 
   **注意：**
-  1. undefined cache，你需要 `import "github.com/tal-tech/go-zero/core/stores/cache"`
+  1. undefined cache，你需要 `import "github.com/zeromicro/go-zero/core/stores/cache"`
   2. undefined model, sqlx, hash 等，你需要在文件中
   
   ```golang
   import "shorturl/rpc/transform/model"
-
-  import "github.com/tal-tech/go-zero/core/stores/sqlx"
+  
+  import "github.com/zeromicro/go-zero/core/stores/sqlx"
   ```
 
 ## 10. 完整调用演示
 
+* 在 `shorturl` 目录下执行 `go mod tidy`  整理依赖
+
+* 重新依次启动 redis-server,etcd-server,mysql-server, rpc 服务
+
+```shell
+# etcd,redis,mysql 自行根据找教程安装启动
+# 启动 rpc 服务
+cd rpc/transform
+go run transform.go -f etc/transform.yaml
+```
+* 新开终端启动 api 服务
+
+```shell
+cd api
+go run shorturl.go -f etc/shorturl-api.yaml
+```
 * shorten api 调用
 
   ```shell
-  curl -i "http://localhost:8888/shorten?url=http://www.xiaoheiban.cn"
+  # 新开终端调用
+  curl -i "http://localhost:8888/shorten?url=https://go-zero.dev"
   ```
 
   返回如下：
 
   ```http
   HTTP/1.1 200 OK
-  Content-Type: application/json
-  Date: Sat, 29 Aug 2020 10:49:49 GMT
-  Content-Length: 21
-  
-  {"shorten":"f35b2a"}
+  Content-Type: application/json; charset=utf-8
+  Traceparent: 00-fe81053320bb99d1d924021a110765bd-fa915fae41db454d-00
+  Date: Thu, 10 Aug 2023 03:32:05 GMT
+  Content-Length: 20
+
+  {"shorten":"b0434f"}%
   ```
 
 * expand api 调用
 
   ```shell
-  curl -i "http://localhost:8888/expand?shorten=f35b2a"
+  # shorten 值为上一步返回的值为准，每个人返回的值不一样
+  curl -i "http://localhost:8888/expand?shorten=b0434f"
   ```
 
   返回如下：
 
   ```http
   HTTP/1.1 200 OK
-  Content-Type: application/json
-  Date: Sat, 29 Aug 2020 10:51:53 GMT
-  Content-Length: 34
-  
-  {"url":"http://www.xiaoheiban.cn"}
+  Content-Type: application/json; charset=utf-8
+  Traceparent: 00-0b11aab486c47a35586d6ed08236afb2-b12387d8cc1e3508-00
+  Date: Thu, 10 Aug 2023 03:32:54 GMT
+  Content-Length: 29
+
+  {"url":"https://go-zero.dev"}%
   ```
 
 ## 11. Benchmark
 
 因为写入依赖于 mysql 的写入速度，就相当于压 mysql 了，所以压测只测试了 expand 接口，相当于从 mysql 里读取并利用缓存，shorten.lua 里随机从 db 里获取了 100 个热 key 来生成压测请求
 
-![Benchmark](https://gitee.com/kevwan/static/raw/master/doc/images/shorturl-benchmark.png)
+![Benchmark](https://raw.githubusercontent.com/zeromicro/zero-doc/main/doc/images/shorturl-benchmark.png)
 
 可以看出在我的 MacBook Pro 上能达到 3 万 + 的 qps。
 

@@ -1,6 +1,6 @@
 # JWT鉴权中间件
 
-这里只介绍我们如何使用该中间件，具体内容请点击[基于go-zero实现JWT认证](https://github.com/tal-tech/zero-doc/blob/main/doc/jwt.md)
+这里只介绍我们如何使用该中间件，具体内容请点击[基于go-zero实现JWT认证](https://github.com/zeromicro/zero-doc/blob/main/doc/jwt.md)
 
 
 ## example
@@ -13,9 +13,9 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/tal-tech/go-zero/core/conf"
-	"github.com/tal-tech/go-zero/example/graceful/etcd/api/config"
-	"github.com/tal-tech/go-zero/rest"
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/example/graceful/etcd/api/config"
+	"github.com/zeromicro/go-zero/rest"
 )
 
 var configFile = flag.String("f", "etc/graceful-api.json", "the config file")

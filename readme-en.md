@@ -4,15 +4,18 @@
 
 English | [简体中文](readme.md)
 
-[![Go](https://github.com/tal-tech/go-zero/workflows/Go/badge.svg?branch=master)](https://github.com/tal-tech/go-zero/actions)
-[![codecov](https://codecov.io/gh/tal-tech/go-zero/branch/master/graph/badge.svg)](https://codecov.io/gh/tal-tech/go-zero)
-[![Go Report Card](https://goreportcard.com/badge/github.com/tal-tech/go-zero)](https://goreportcard.com/report/github.com/tal-tech/go-zero)
-[![Release](https://img.shields.io/github/v/release/tal-tech/go-zero.svg?style=flat-square)](https://github.com/tal-tech/go-zero)
+[![Go](https://github.com/zeromicro/go-zero/workflows/Go/badge.svg?branch=master)](https://github.com/zeromicro/go-zero/actions)
+[![codecov](https://codecov.io/gh/zeromicro/go-zero/branch/master/graph/badge.svg)](https://codecov.io/gh/zeromicro/go-zero)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zeromicro/go-zero)](https://goreportcard.com/report/github.com/zeromicro/go-zero)
+[![Release](https://img.shields.io/github/v/release/zeromicro/go-zero.svg?style=flat-square)](https://github.com/zeromicro/go-zero)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+# Document
+[https://go-zero.dev/en/](https://go-zero.dev/en/)
 
 ## 0. what is go-zero
 
-go-zero is a web and rpc framework that with lots of engineering practices builtin. It’s born to ensure the stability of the busy services with resilience design, and has been serving sites with tens of millions users for years.
+go-zero is a web and rpc framework with lots of engineering practical builtins. It’s born to ensure the stability of the heavy workload services with resilience designs. So far, It has been serving sites with tens of millions users for years.
 
 go-zero contains simple API description syntax and code generation tool called `goctl`. You can generate Go, iOS, Android, Kotlin, Dart, TypeScript, JavaScript from .api files with `goctl`.
 
@@ -21,7 +24,7 @@ Advantages of go-zero:
 * improve the stability of the services with tens of millions of daily active users
 * builtin chained timeout control, concurrency control, rate limit, adaptive circuit breaker, adaptive load shedding, even no configuration needed
 * builtin middlewares also can be integrated into your frameworks
-* simple API syntax, one command to generate couple of different languages
+* simple API syntax, one command to generate a couple of different languages
 * auto validate the request parameters from clients
 * plenty of builtin microservice management and concurrent toolkits
 
@@ -29,7 +32,7 @@ Advantages of go-zero:
 
 ## 1. Backgrounds of go-zero
 
-At the beginning of 2018, we heavily suffered from frequent downtime. We decided to re-design our system, from monolithic architecture with Java+MongoDB to microservice architecture. After researches and comparison, we chose to:
+At the beginning of 2018, we heavily suffered from frequent downtime. We decided to re-design our system, refactoring from monolithic architecture with Java+MongoDB to microservice architecture. After researches and comparison, we chose to:
 
 * Golang based
   * great performance
@@ -44,7 +47,7 @@ At the beginning of 2018, we heavily suffered from frequent downtime. We decided
 
 ## 2. Design considerations on go-zero
 
-By designing the microservice architecture, we expected to ensure the stability, as well as the productivity. And from just the beginning, we have the following design principles:
+By designing the microservice architecture, we expected to ensure the stability, as well as the productivity. From the very beginning, we have the following design principles:
 
 * keep it simple
 * high availability
@@ -88,7 +91,7 @@ As below, go-zero protects the system with couple layers and mechanisms:
 Run the following command under your project:
 
 ```shell
-go get -u github.com/tal-tech/go-zero
+go get -u github.com/zeromicro/go-zero
 ```
 
 ## 6. Quick Start
@@ -104,7 +107,7 @@ go get -u github.com/tal-tech/go-zero
    `goctl`can be read as `go control`. `goctl` means not to be controlled by code, instead, we control it. The inside `go` is not `golang`. At the very beginning, I was expecting it to help us improve the productivity, and make our lives easier.
 
    ```shell
-   GO111MODULE=on go get -u github.com/tal-tech/go-zero/tools/goctl
+   GO111MODULE=on go get -u github.com/zeromicro/go-zero/tools/goctl
    ```
 
    make sure goctl is executable.
@@ -112,11 +115,11 @@ go get -u github.com/tal-tech/go-zero
 2. create the API file, like greet.api, you can install the plugin of goctl in vs code, api syntax is supported.
 
    ```go
-   type Request struct {
+   type Request {
      Name string `path:"name,options=you|me"` // parameters are auto validated
    }
 
-   type Response struct {
+   type Response {
      Message string `json:"message"`
    }
 
@@ -128,7 +131,7 @@ go get -u github.com/tal-tech/go-zero
    }
    ```
 
-   the .api files also can be generate by goctl, like below:
+   the .api files also can be generated by goctl, like below:
 
    ```shell
    goctl api -o greet.api

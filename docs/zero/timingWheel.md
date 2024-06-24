@@ -276,8 +276,7 @@ func (tw *TimingWheel) getPositionAndCircle(d time.Duration) (pos int, circle in
 
 ## 参考资料
 
-- [go-zero](https://github.com/tal-tech/go-zero)
-- [go-zero 文档](https://www.yuque.com/tal-tech/go-zero)
-- [go-zero中 collection.Cache](https://github.com/tal-tech/zero-doc/blob/main/doc/collection.md)
+- [go-zero](https://github.com/zeromicro/go-zero)
+- [go-zero中 collection.Cache](https://github.com/zeromicro/zero-doc/blob/main/doc/collection.md)
 
 <Vssue title="timingWheel" />

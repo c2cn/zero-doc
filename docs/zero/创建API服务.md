@@ -57,7 +57,7 @@ Done.
 ```
 
 
-> NOTE:关于api语法请查看[《api语法》](https://www.yuque.com/tal-tech/go-zero/ze9i30)
+> NOTE:关于api语法请查看[《api语法》](https://www.yuque.com/zeromicro/go-zero/ze9i30)
 
 
 
@@ -181,11 +181,5 @@ $ curl -i -X POST http://localhost:8888/user/ping
 
 本节主要演示怎样从创建api文件到启动一个api服务，下一节我们将演示怎么连接访问数据库进行数据交互
 
-
-# 参考文档
-
-
-- [附录1:api语法定义](https://www.yuque.com/tal-tech/go-zero/ze9i30)
-- [附录2:api目录结构](https://www.yuque.com/tal-tech/go-zero/wixzpx)
 
 <Vssue title="创建API服务" />

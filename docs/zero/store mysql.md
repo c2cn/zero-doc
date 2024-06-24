@@ -52,7 +52,7 @@ func NewMysqlModel(conn sqlx.SqlConn, table string) *MysqlModel {
 
 准备一个 `User model` 
 ```go
-var userBuilderQueryRows = strings.Join(builderx.FieldNames(&User{}), ",")
+var userBuilderQueryRows = strings.Join(builder.FieldNames(&User{}), ",")
 
 type User struct {
     Avatar string `db:"avatar"` 			// 头像
@@ -167,18 +167,17 @@ err := usermodel.conn.Transact(func(session sqlx.Session) error {
         return err
     }
     defer stmt.Close()
-    
+
     // 返回任何错误都会回滚事务
     if _, err := stmt.Exec(uid, username, mobilephone); err != nil {
         logx.Errorf("insert userinfo stmt exec: %s", err)
         return err
     }
-    
+
     // 还可以继续执行 insert/update/delete 相关操作
     return nil
 })
 ```
 如同上述例子，开发者只需将 **事务** 中的操作都包装在一个函数 `func(session sqlx.Session) error {}` 中即可，如果事务中的操作返回任何错误， `Transact()` 都会自动回滚事务。
-
 
 <Vssue title="storemysql" />
